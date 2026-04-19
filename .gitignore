@@ -40,3 +40,7 @@ airflow/*.pid
 # Jupyter
 .ipynb_checkpoints/
 notebooks/
+# Model artifacts (too large for GitHub — retrain on server)
+models/*.joblib
+models/*.pkl
+models/metadata.json
