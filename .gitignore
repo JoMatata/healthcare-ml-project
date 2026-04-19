@@ -22,8 +22,8 @@ __pycache__/
 *.pyo
 
 # Trained models 
-models/*.joblib
-models/*.pkl
+
+
 
 # Raw data
 data/raw/
