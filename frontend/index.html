@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare ML Predictor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 580px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, select {
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2d3748;
+            transition: border-color 0.2s;
+            background: #f7fafc;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4299e1;
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover { background: #2c5282; }
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #a0aec0; cursor: not-allowed; }
+
+        .result {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .result.normal      { background: #f0fff4; border: 2px solid #68d391; }
+        .result.abnormal    { background: #fff5f5; border: 2px solid #fc8181; }
+        .result.inconclusive{ background: #fffff0; border: 2px solid #f6e05e; }
+
+        .result h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .result.normal h2       { color: #276749; }
+        .result.abnormal h2     { color: #9b2c2c; }
+        .result.inconclusive h2 { color: #744210; }
+
+        .result p { color: #718096; font-size: 14px; }
+
+        .error {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            color: #c53030;
+            font-size: 13px;
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 3px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="badge">🏥 Healthcare ML System</span>
+        <h1>Patient Test Result Predictor</h1>
+        <p>Enter patient details to predict: Normal, Abnormal, or Inconclusive</p>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="age" placeholder="e.g. 45" min="0" max="120">
+        </div>
+
+        <div class="form-group">
+            <label>Gender</label>
+            <select id="gender">
+                <option value="">Select...</option>
+                <option>Male</option>
+                <option>Female</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Blood Type</label>
+            <select id="blood_type">
+                <option value="">Select...</option>
+                <option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option>
+                <option>AB+</option><option>AB-</option>
+                <option>O+</option><option>O-</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Admission Type</label>
+            <select id="admission_type">
+                <option value="">Select...</option>
+                <option>Emergency</option>
+                <option>Elective</option>
+                <option>Urgent</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Medical Condition</label>
+            <select id="medical_condition">
+                <option value="">Select...</option>
+                <option>Diabetes</option>
+                <option>Hypertension</option>
+                <option>Asthma</option>
+                <option>Cancer</option>
+                <option>Obesity</option>
+                <option>Arthritis</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Medication</label>
+            <select id="medication">
+                <option value="">Select...</option>
+                <option>Aspirin</option>
+                <option>Ibuprofen</option>
+                <option>Paracetamol</option>
+                <option>Penicillin</option>
+                <option>Lipitor</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Insurance Provider</label>
+            <select id="insurance_provider">
+                <option value="">Select...</option>
+                <option>Aetna</option>
+                <option>Blue Cross</option>
+                <option>Cigna</option>
+                <option>Medicare</option>
+                <option>UnitedHealthcare</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Length of Stay (days)</label>
+            <input type="number" id="length_of_stay" placeholder="e.g. 5" min="1">
+        </div>
+
+        <div class="form-group full-width">
+            <label>Billing Amount ($)</label>
+            <input type="number" id="billing_amount" placeholder="e.g. 15000" min="0">
+        </div>
+    </div>
+
+    <button id="predictBtn" onclick="predict()">
+        Predict Test Result
+    </button>
+
+    <div class="error" id="error"></div>
+
+    <div class="result" id="result">
+        <h2 id="resultText"></h2>
+        <p id="resultSub"></p>
+    </div>
+</div>
+
+<script>
+    // Change this to your Railway URL after deployment
+    const API_URL = "http://127.0.0.1:8000";
+
+    async function predict() {
+        const btn = document.getElementById("predictBtn");
+        const resultDiv = document.getElementById("result");
+        const errorDiv = document.getElementById("error");
+
+        // Hide previous results
+        resultDiv.style.display = "none";
+        errorDiv.style.display = "none";
+
+        // Collect values
+        const fields = {
+            Age:                parseFloat(document.getElementById("age").value),
+            Gender:             document.getElementById("gender").value,
+            Blood_Type:         document.getElementById("blood_type").value,
+            Medical_Condition:  document.getElementById("medical_condition").value,
+            Billing_Amount:     parseFloat(document.getElementById("billing_amount").value),
+            Admission_Type:     document.getElementById("admission_type").value,
+            Insurance_Provider: document.getElementById("insurance_provider").value,
+            Medication:         document.getElementById("medication").value,
+            Length_of_Stay:     parseInt(document.getElementById("length_of_stay").value),
+        };
+
+        // Basic validation
+        for (const [key, val] of Object.entries(fields)) {
+            if (!val || (typeof val === "number" && isNaN(val))) {
+                errorDiv.textContent = `⚠️ Please fill in all fields (missing: ${key.replace("_", " ")})`;
+                errorDiv.style.display = "block";
+                return;
+            }
+        }
+
+        // Loading state
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Predicting...';
+
+        try {
+            const response = await fetch(`${API_URL}/predict`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(fields)
+            });
+
+            if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+            const data = await response.json();
+            const prediction = data.predicted_test_result;
+
+            // Show result with colour coding
+            resultDiv.className = "result " + prediction.toLowerCase();
+            resultDiv.style.display = "block";
+
+            const icons = { Normal: "✅", Abnormal: "⚠️", Inconclusive: "🔍" };
+            const subs  = {
+                Normal:       "Patient test results appear within normal range.",
+                Abnormal:     "Patient test results indicate abnormal findings.",
+                Inconclusive: "Test results are inconclusive. Further testing recommended."
+            };
+
+            document.getElementById("resultText").textContent =
+                `${icons[prediction]} ${prediction}`;
+            document.getElementById("resultSub").textContent =
+                subs[prediction] || "";
+
+        } catch (err) {
+            errorDiv.textContent = `❌ Could not reach the API. Make sure it is running. (${err.message})`;
+            errorDiv.style.display = "block";
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = "Predict Test Result";
+        }
+    }
+</script>
+</body>
+</html>

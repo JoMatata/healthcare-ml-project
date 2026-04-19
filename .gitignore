@@ -1,0 +1,42 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+
+# Virtual environment
+.venv/
+
+# Environment variables 
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Trained models 
+models/*.joblib
+models/*.pkl
+
+# Raw data
+data/raw/
+
+# Airflow
+airflow/logs/
+airflow/airflow.db
+airflow/*.cfg
+airflow/*.pid
+
+# VSCode
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/

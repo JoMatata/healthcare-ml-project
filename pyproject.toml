@@ -1,0 +1,22 @@
+[project]
+name = "healthcare-ml-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "apache-airflow-providers-standard>=1.12.3",
+    "apache-airflow[postgres]>=3.0.0",
+    "fastapi>=0.136.0",
+    "joblib>=1.5.3",
+    "kagglehub>=1.0.0",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.13.1",
+    "python-dotenv>=1.2.2",
+    "scikit-learn>=1.8.0",
+    "sqlalchemy>=2.0.49",
+    "uvicorn>=0.44.0",
+    "xgboost>=3.2.0",
+]
